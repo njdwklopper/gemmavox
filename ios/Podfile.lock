@@ -1,0 +1,72 @@
+PODS:
+  - Flutter (1.0.0)
+  - flutter_gemma (0.8.6):
+    - Flutter
+    - MediaPipeTasksGenAI (= 0.10.24)
+    - MediaPipeTasksGenAIC (= 0.10.24)
+  - large_file_handler (0.0.1):
+    - Flutter
+  - MediaPipeTasksGenAI (0.10.24):
+    - MediaPipeTasksGenAIC (= 0.10.24)
+  - MediaPipeTasksGenAIC (0.10.24)
+  - mic_stream (0.0.1):
+    - Flutter
+  - path_provider_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - permission_handler_apple (9.3.0):
+    - Flutter
+  - shared_preferences_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - sound_stream (0.1.0):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - flutter_gemma (from `.symlinks/plugins/flutter_gemma/ios`)
+  - large_file_handler (from `.symlinks/plugins/large_file_handler/ios`)
+  - mic_stream (from `.symlinks/plugins/mic_stream/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
+  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
+  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
+  - sound_stream (from `.symlinks/plugins/sound_stream/ios`)
+
+SPEC REPOS:
+  trunk:
+    - MediaPipeTasksGenAI
+    - MediaPipeTasksGenAIC
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  flutter_gemma:
+    :path: ".symlinks/plugins/flutter_gemma/ios"
+  large_file_handler:
+    :path: ".symlinks/plugins/large_file_handler/ios"
+  mic_stream:
+    :path: ".symlinks/plugins/mic_stream/ios"
+  path_provider_foundation:
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
+  permission_handler_apple:
+    :path: ".symlinks/plugins/permission_handler_apple/ios"
+  shared_preferences_foundation:
+    :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
+  sound_stream:
+    :path: ".symlinks/plugins/sound_stream/ios"
+
+SPEC CHECKSUMS:
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  flutter_gemma: c104e5c505eac327a0877a7cb21a593982703154
+  large_file_handler: b37481e9b4972562ffcdc8f75700f47cd592bcec
+  MediaPipeTasksGenAI: 076ba7032a6e9da16db9c7cf0c3b67c751c18bc1
+  MediaPipeTasksGenAIC: ec35d9f431f6a6b651a0bc9f67a4ed149ffa575c
+  mic_stream: 5b34e9b3939173b7d42ad30a92d704b72221bacf
+  path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
+  permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
+  shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
+  sound_stream: da51a14584a120d7e7e0aeaa1e0748217d235bea
+
+PODFILE CHECKSUM: ded38b422d9242255ccf29312a30f6094f6be708
+
+COCOAPODS: 1.16.2
