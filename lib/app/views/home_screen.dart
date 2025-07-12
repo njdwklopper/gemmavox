@@ -76,23 +76,23 @@ class HomeScreen extends StatelessWidget {
 
   Widget _imageButton(BuildContext context, HomeButton button) {
     final size = 230.0;
+    bool _isTapped = false;
 
     return Padding(
       padding: const EdgeInsets.all(7.0),
       child: StatefulBuilder(
         builder: (context, setState) {
-          bool isTapped = false;
 
           return GestureDetector(
-            onTapDown: (_) => setState(() => isTapped = true),
+            onTapDown: (_) => setState(() => _isTapped = true),
             onTapUp: (_) {
-              setState(() => isTapped = false);
+              setState(() => _isTapped = false);
               Navigator.pushReplacementNamed(context, button.route);
             },
-            onTapCancel: () => setState(() => isTapped = false),
+            onTapCancel: () => setState(() => _isTapped = false),
             child: AnimatedScale(
               duration: const Duration(milliseconds: 120),
-              scale: isTapped ? 0.92 : 1.0,
+              scale: _isTapped ? 0.92 : 1.0,
               curve: Curves.easeInOut,
               child: Stack(
                 alignment: Alignment.center,
