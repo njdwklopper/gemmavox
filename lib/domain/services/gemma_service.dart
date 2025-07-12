@@ -35,7 +35,7 @@ class GemmaService {
     final modelPath = '${directory.path}/gemma-3n-E2B-it-int4.task';
 
     final modelFile = File(modelPath);
-    if (!await modelFile.exists() || await modelFile.length() < 1024 * 1024 * 50) {
+    if (!await modelFile.exists()) {
       downloadFileWithProgress(huggingUrl, modelPath, huggingApiKey);
     } else {
       _loadModel(modelPath);
@@ -74,7 +74,7 @@ class GemmaService {
   }
 
   _loadModel(String filePath) async {
-    print(filePath);
+    debugPrint('Loading model on path: $filePath');
     await _plugin.modelManager.setModelPath(filePath);
     _inferenceModel = await _plugin.createModel(
       modelType: ModelType.gemmaIt,
