@@ -87,7 +87,7 @@ class HomeScreen extends StatelessWidget {
             onTapDown: (_) => setState(() => _isTapped = true),
             onTapUp: (_) {
               setState(() => _isTapped = false);
-              Navigator.pushReplacementNamed(context, button.route);
+              Navigator.pushNamed(context, button.route);
             },
             onTapCancel: () => setState(() => _isTapped = false),
             child: AnimatedScale(

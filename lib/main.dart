@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:gemma_vox/app/views/model_loader_screen.dart';
+import 'package:gemma_vox/app/views/translate_screen.dart';
 import 'app/views/home_screen.dart';
 
 void main() async {
@@ -16,13 +20,34 @@ class MyApp extends StatelessWidget {
       title: 'GemmaVox',
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
-      routes: {
-        '/': (context) => const LoadModelScreen(),
-        '/home': (context) => const HomeScreen(),
-        '/conversation': (context) => const HomeScreen(),
-        '/translator': (context) => const HomeScreen(), // One more idea, copy and "share" any text to app for translation quickly
-        '/phrasecards': (context) => const HomeScreen(),
+      onGenerateRoute: (settings) {
+        switch (settings.name) {
+          case '/':
+            return buildPageRoute(const LoadModelScreen());
+          case '/home':
+            return buildPageRoute(const HomeScreen());
+          case '/conversation':
+            return buildPageRoute(const TranslatePage());
+          case '/voice_translator':
+            return buildPageRoute(const TranslatePage());
+          case '/phrasecards':
+            return buildPageRoute(const TranslatePage());
+          default:
+            throw Exception('Invalid route: ${settings.name}');
+        }
       },
+    );
+  }
+}
+
+PageRoute buildPageRoute(Widget page) {
+  if (Platform.isIOS) {
+    return CupertinoPageRoute(builder: (_) => page);
+  } else {
+    return PageRouteBuilder(
+      pageBuilder: (_, __, ___) => page,
+      transitionsBuilder: (_, animation, __, child) =>
+          FadeTransition(opacity: animation, child: child),
     );
   }
 }

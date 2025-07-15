@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:gemma_vox/domain/services/gemma_service.dart';
 
-import '../../core/constants.dart';
-
 class LoadModelScreen extends StatefulWidget {
   const LoadModelScreen({super.key});
 
@@ -36,12 +34,8 @@ class _LoadModelScreenState extends State<LoadModelScreen> {
   }
 
   _completeDownload() async {
-    _updateResponse(await GemmaService.instance.getPromptAndFullResponse(greeting));
-
-    Future.delayed(const Duration(seconds: 5), () {
     if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/home');
-    });
+    Navigator.pushReplacementNamed(context, '/home');
   }
 
   @override
@@ -50,11 +44,5 @@ class _LoadModelScreenState extends State<LoadModelScreen> {
       body:
           Center(child: Text(_response, style: const TextStyle(fontSize: 18))),
     );
-  }
-
-  _updateResponse(String response) {
-    setState(() {
-      _response = response;
-    });
   }
 }
