@@ -4,10 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:gemma_vox/app/views/model_loader_screen.dart';
 import 'package:gemma_vox/app/views/translate_screen.dart';
+import 'package:gemma_vox/domain/locators.dart';
 import 'app/views/home_screen.dart';
+import 'package:get_it/get_it.dart';
+
+final getIt = GetIt.instance;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  setupGetItLocators();
   runApp(const MyApp());
 }
 

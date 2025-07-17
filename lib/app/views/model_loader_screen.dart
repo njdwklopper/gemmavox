@@ -1,7 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:gemma_vox/domain/services/gemma_service.dart';
+import '../../domain/locators.dart';
 
 class LoadModelScreen extends StatefulWidget {
   const LoadModelScreen({super.key});
@@ -11,26 +10,20 @@ class LoadModelScreen extends StatefulWidget {
 }
 
 class _LoadModelScreenState extends State<LoadModelScreen> {
+  final _gemma = getIt<GemmaService>();
   String _response = '';
-  late StreamSubscription<String> _subscription;
 
   @override
   void initState() {
     super.initState();
-    _initializeApp();
-  }
-
-  Future<void> _initializeApp() async {
-    _subscription = GemmaService.instance.tokenStream.listen((progress) {
+    _gemma.setListener((token) {
       setState(() {
-        _response = progress;
-        if (progress.contains("done")){
+        _response = token;
+        if (token.contains("done")){
           _completeDownload();
-          _subscription.cancel();
         }
       });
     });
-    await GemmaService.instance.initialize();
   }
 
   _completeDownload() async {

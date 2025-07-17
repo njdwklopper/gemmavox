@@ -130,7 +130,7 @@ packages:
     source: hosted
     version: "1.1.1"
   coast_audio:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: coast_audio
       sha256: edcaffde2f42c17a952f048d2762e801052c7e7cdaeae486ec2f095aec29f7f3
@@ -223,7 +223,7 @@ packages:
     source: sdk
     version: "0.0.0"
   flutter_dotenv:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: flutter_dotenv
       sha256: b7c7be5cd9f6ef7a78429cabd2774d3c4af50e79cb2b7593e3d5d763ef95c61b
@@ -231,7 +231,7 @@ packages:
     source: hosted
     version: "5.2.1"
   flutter_gemma:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: flutter_gemma
       sha256: "5ee780583ec946f3aada12197b51ee1a15b211e3e1513dc74c48b2314ded605a"
@@ -264,6 +264,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.0"
+  get_it:
+    dependency: "direct main"
+    description:
+      name: get_it
+      sha256: f126a3e286b7f5b578bf436d5592968706c4c1de28a228b870ce375d9f743103
+      url: "https://pub.dev"
+    source: hosted
+    version: "8.0.3"
   glob:
     dependency: transitive
     description:
@@ -281,7 +289,7 @@ packages:
     source: hosted
     version: "2.3.2"
   http:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: http
       sha256: "2c11f3f94c687ee9bad77c171151672986360b2b001d109814ee7140b2cf261b"
@@ -401,7 +409,7 @@ packages:
     source: hosted
     version: "1.15.0"
   mic_stream:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: mic_stream
       sha256: cd024113c2e25d32172af483816cef49eb808458ceb3186fa4e3e53353bf13cd
@@ -433,7 +441,7 @@ packages:
     source: hosted
     version: "1.9.0"
   path_provider:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: path_provider
       sha256: "50c5dd5b6e1aaf6fb3a78b33f6aa3afca52bf903a8a5298f53101fdaee55bbcd"
@@ -646,7 +654,7 @@ packages:
     source: sdk
     version: "0.0.0"
   sound_stream:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: sound_stream
       sha256: "66e68cc6be9423c6ebbe40bcf177c61ae6b75fce8189c51fbf9db7f54d4ef23d"

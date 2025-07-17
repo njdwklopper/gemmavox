@@ -1,79 +1,64 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter_gemma/core/model.dart';
 import 'package:flutter_gemma/flutter_gemma.dart';
 import 'package:flutter_gemma/pigeon.g.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_gemma/core/chat.dart';
 
 class GemmaService {
   final FlutterGemmaPlugin _plugin = FlutterGemmaPlugin.instance;
-  late InferenceModel? _inferenceModel;
+  InferenceModel? _inferenceModel;
+  InferenceChat? _chat;
 
-  GemmaService._privateConstructor();
+  void Function(String)? _onTokenUpdate;
+  StreamSubscription<String>? _tokenSubscription;
 
-  static final GemmaService _instance = GemmaService._privateConstructor();
-  static GemmaService get instance => _instance;
+  GemmaService() {
+    _initialize();
+  }
 
-  InferenceModelSession? _session;
+  Future<void> _initialize() async {
+    final directory = await getApplicationDocumentsDirectory();
+    final modelPath = '${directory.path}/gemma-3n-E2B-it-int4.task';
+    final modelFile = File(modelPath);
+    if (!await modelFile.exists()) {
+      await _downloadFileWithProgress(modelPath);
+    } else {
+      await _loadModel(modelPath);
+    }
+  }
 
-  final StreamController<String> _tokenStreamController =
-      StreamController<String>.broadcast();
-
-  Stream<String> get tokenStream => _tokenStreamController.stream;
-
-  initialize() async {
+  Future<void> _downloadFileWithProgress(String modelPath) async {
     await dotenv.load(fileName: '.env');
     final huggingUrl = dotenv.env['HUGGING_URL']!;
     final huggingApiKey = dotenv.env['HUGGING_API']!;
     debugPrint('huggingface url: $huggingUrl');
     debugPrint('huggingface key: $huggingApiKey');
-
-    final directory = await getApplicationDocumentsDirectory();
-    final modelPath = '${directory.path}/gemma-3n-E2B-it-int4.task';
-
-    final modelFile = File(modelPath);
-    if (!await modelFile.exists()) {
-      downloadFileWithProgress(huggingUrl, modelPath, huggingApiKey);
-    } else {
-      _loadModel(modelPath);
-    }
-  }
-
-  Future<void> downloadFileWithProgress(String url, String modelPath, String token) async {
     final client = http.Client();
-    final request = http.Request('GET', Uri.parse(url));
-    request.headers['Authorization'] = 'Bearer $token';
-
+    final request = http.Request('GET', Uri.parse(huggingUrl));
+    request.headers['Authorization'] = 'Bearer $huggingApiKey';
     final response = await client.send(request);
 
     final contentLength = response.contentLength ?? 0;
     int downloaded = 0;
-
     final file = File(modelPath);
     final sink = file.openWrite();
 
-    response.stream.listen(
-          (List<int> chunk) {
-        downloaded += chunk.length;
-        sink.add(chunk);
-        final progress = (downloaded / contentLength) * 100;
-        _tokenStreamController.add('Download progress: ${progress.toStringAsFixed(2)}%');
-      },
-      onDone: () async {
-        await sink.close();
-        _loadModel(modelPath);
-      },
-      onError: (e) {
-        _tokenStreamController.add('Download error: $e');
-      },
-      cancelOnError: true,
-    );
+    await for (final chunk in response.stream) {
+      downloaded += chunk.length;
+      sink.add(chunk);
+      final progress = (downloaded / contentLength) * 100;
+      _emit('Download progress: ${progress.toStringAsFixed(2)}%');
+    }
+    await sink.close();
+    await _loadModel(modelPath);
   }
 
-  _loadModel(String filePath) async {
+  Future<void> _loadModel(String filePath) async {
     debugPrint('Loading model on path: $filePath');
     await _plugin.modelManager.setModelPath(filePath);
     _inferenceModel = await _plugin.createModel(
@@ -83,60 +68,68 @@ class GemmaService {
       supportImage: false,
       maxNumImages: 0,
     );
-    await createSession();
-    _tokenStreamController.add('Download done: $filePath');
-  }
 
-  createSession() async {
-    if (_inferenceModel != null && _session == null) {
-      _session = await _inferenceModel!.createSession();
-    }
-    if (_inferenceModel == null) {
-      throw Exception('Inference model is not initialized.');
-    }
-  }
-
-  closeSession() async {
-    if (_session != null) {
-      await _session!.close();
-      _session = null;
-    }
+    await _createSession();
+    _emit('Download done: $filePath');
   }
 
   Future<void> sendPrompt(String prompt) async {
-    if (_session != null) {
-      await _session!.addQueryChunk(Message(text: prompt, isUser: true));
-      await for (final token in _session!.getResponseAsync()) {
-        _tokenStreamController.add(token);
-      }
-    } else {
-      throw Exception('Session is not initialized.');
-    }
+    _subToSessionTokensWithPrompt(prompt, (token) {
+      _emit(token);
+    });
   }
 
-  Future<String> getPromptAndFullResponse(String prompt) async {
-    if (_session != null) {
-      final buffer = StringBuffer();
-      await _session!.addQueryChunk(Message(text: prompt, isUser: true));
-
-      await for (final token in _session!.getResponseAsync()) {
-        buffer.write(token);
-      }
-      return buffer.toString();
-    } else {
-      throw Exception('Session is not initialized.');
-    }
+  Future<String> sendPromptForFullResponse(String prompt) async {
+    final buffer = StringBuffer();
+    _subToSessionTokensWithPrompt(prompt, (token) {
+      buffer.write(token);
+    });
+    return buffer.toString();
   }
 
-  Future<void> clear() async {
-    await tokenStream.drain();
-    await _tokenStreamController.close();
+  void _subToSessionTokensWithPrompt(String prompt, void Function(String) update) async {
+    if (_chat == null) await _createSession();
+    await _chat?.addQueryChunk(Message(text: prompt, isUser: true));
+    _tokenSubscription = _inferenceModel!.chat?.generateChatResponseAsync().listen(
+      (token) {
+        update(token);
+      },
+      onDone: () {
+        _tokenSubscription = null;
+      },
+      onError: (err, stack) {
+        _tokenSubscription = null;
+        debugPrint('Error in token stream: $err');
+      },
+      cancelOnError: true,
+    );
+  }
+
+  void _emit(String token) {
+    _onTokenUpdate?.call(token);
+  }
+
+  void setListener(void Function(String) listener) {
+    _onTokenUpdate = listener;
+  }
+
+  Future<void> _createSession() async {
+    _chat = await _inferenceModel?.createChat(
+      temperature: 0.3,
+      randomSeed: 1,
+      topK: 42,
+      topP: 0.93,
+      tokenBuffer: 256,
+      supportImage: false,
+    );
   }
 
   Future<void> dispose() async {
-    closeSession();
-    await _inferenceModel?.close();
-    _inferenceModel = null;
-    clear();
+    await _chat?.session.close();
+    await _chat?.clearHistory();
+    await _tokenSubscription?.cancel();
+    _onTokenUpdate = null;
+    _tokenSubscription = null;
+    _chat = null;
   }
 }

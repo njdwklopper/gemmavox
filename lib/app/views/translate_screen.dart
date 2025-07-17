@@ -1,7 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:gemma_vox/domain/services/gemma_service.dart';
+import '../../domain/locators.dart';
 
 class TranslateScreen extends StatelessWidget {
   const TranslateScreen({super.key});
@@ -13,7 +12,7 @@ class TranslateScreen extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const TranslatePage(),
+      home: TranslatePage(),
     );
   }
 }
@@ -26,22 +25,18 @@ class TranslatePage extends StatefulWidget {
 }
 
 class _TranslatePageState extends State<TranslatePage> {
+  final _gemma = getIt<GemmaService>();
   String _response = '';
-  late StreamSubscription<String> _subscription;
 
   @override
   void initState() {
     super.initState();
-    _initializeApp();
-  }
-
-  Future<void> _initializeApp() async {
-    _subscription = GemmaService.instance.tokenStream.listen((token) {
+    _gemma.setListener((token) {
       setState(() {
         _response += token;
       });
     });
-    await GemmaService.instance.sendPrompt('Translate "Hello" to Khmer.');
+    _gemma.sendPrompt('Translate "Hello" to Khmer.');
   }
 
   @override
@@ -64,7 +59,7 @@ class _TranslatePageState extends State<TranslatePage> {
 
   @override
   dispose() {
-    _subscription.cancel();
     super.dispose();
+    _gemma.dispose();
   }
 }
